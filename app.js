@@ -32,7 +32,7 @@ async function getEntities() {
   return result;
 }
 
-app.get('/', async (req, res) => {
+app.get('/entities', async (req, res) => {
   const entities = await getEntities();
   console.log(`${entities.length} entities returned`);
 
