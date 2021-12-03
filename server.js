@@ -5,8 +5,12 @@ const axios = require("axios");
 
 const path = __dirname + '/app/views/';
 
-const app = express();
+if (!process.env.LC_API_SUPER) {
+  console.log('Required env var LC_API not set');
+  process.exit(2);
+}
 
+const app = express();
 app.use(express.static(path));
 
 var corsOptions = {
@@ -17,53 +21,58 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// const db = require("./app/models");
-//
-// db.sequelize.sync();
+const urlMap = {
+  staging: 'https://app.leadconduit-staging.com'
+};
 
-async function getEntities() {
-  let result;
+async function getData(environment, resourcePath, res, apiKey = process.env.LC_API_SUPER) {
+  let result = {};
   const config = {
     auth: {
       username: 'X',
-      password: process.env.LC_API
+      password: apiKey
     },
     headers: {
       Accept: 'application/json'
     }
   }
   try {
-    const response = await axios.get('https://app.leadconduit-staging.com/entities', config);
-    result = response.data;
+    result = await axios.get(`${urlMap[environment]}/${resourcePath}`, config);
+    // console.debug(`${result.data.length} ${resourcePath}s returned`);
+    res.send(result.data);
   }
   catch (e) {
-    console.log(`error: ${e}`)
-    result = e.message;
+    console.error(`error: ${e}`)
+    res.status(e.response.status).send(e.message);
   }
-
-  return result;
 }
 
-app.get('/entities', async (req, res) => {
-  const entities = await getEntities();
-  console.log(`${entities.length} entities returned`);
+app.get('/account/:apiKey', async (req, res) => {
+  await getData('staging', 'account', res, req.params.apiKey);
+})
 
-  let sample = []
-  entities.forEach((entity, i) => {
-    if (i < 40) {
-      sample.push(entity);
-    }
-  });
-  res.send(sample);
+app.get('/allowlists', async (req, res) => {
+  await getData('staging', 'packages/allowlist', res);
+})
+
+app.get('/entities', async (req, res) => {
+  await getData('staging', 'entities', res);
+  // const results = response.data;
+  // console.log(`${results.length} entities returned`);
+  //
+  // let sample = []
+  // results.forEach((entity, i) => {
+  //   if (i < 40) {
+  //     sample.push(entity);
+  //   }
+  // });
+  // res.send(sample);
 })
 
 app.get('/', function (req,res) {
   res.sendFile(path + "index.html");
 });
 
-// require("./app/routes/turorial.routes")(app);
-
-// set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);

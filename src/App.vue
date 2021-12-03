@@ -1,14 +1,16 @@
 <template>
-  <HelloWorld msg="LCXX"/>
+  <AllowList/>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+// import HelloWorld from './components/HelloWorld.vue'
+import AllowList from './components/AllowList.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    AllowList,
+    // HelloWorld
   }
 }
 </script>
@@ -21,5 +23,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.error {
+  color: red;
+  font-weight: bold;
 }
 </style>
