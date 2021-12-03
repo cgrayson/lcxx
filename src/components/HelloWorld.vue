@@ -1,7 +1,14 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }} - {{ info }}</h1>
-    <span style="color: red;">{{ error }}</span>
+    <h1>{{ msg }}</h1>
+    <div v-if="error" style="color: red;">{{ error }}</div>
+    <div>
+      <ol>
+        <li v-for="entity in entities" :key="entity.id">
+          {{ entity.name }}
+        </li>
+      </ol>
+    </div>
   </div>
 </template>
 
@@ -16,32 +23,14 @@ export default {
   data () {
     return {
       error: null,
-      info: '.'
+      entities: []
     }
   },
   mounted () {
     axios
-      .get('http://localhost:8080/entities', {})
-      .then(response => (this.info = response))
+      .get('/entities', {})
+      .then(response => (this.entities = response.data))
       .catch(error => this.error = JSON.stringify(error));
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>

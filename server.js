@@ -48,10 +48,10 @@ app.get('/entities', async (req, res) => {
   const entities = await getEntities();
   console.log(`${entities.length} entities returned`);
 
-  let sample = '<ol>';
+  let sample = []
   entities.forEach((entity, i) => {
-    if (i < 10) {
-      sample += `<li>${entity.name} - <code>${entity.id}</code></li>`;
+    if (i < 40) {
+      sample.push(entity);
     }
   });
   res.send(sample);
