@@ -22,6 +22,11 @@
         <h2>{{ integration.id }}</h2>
         <textarea id="story" name="story" rows="5" cols="33" v-model="integration.account_ids" />
         <button @click="updatePackage(integration)">update</button>
+        <div>
+          <ol>
+            <li v-for="id in integration.account_ids" :key="id">{{ id }} = {{ lookupAccount(id) }}</li>
+          </ol>
+        </div>
       </div>
     </div>
   </div>
@@ -41,15 +46,22 @@ export default {
         name: '-'
       },
       error: null,
-      integrations: []
+      integrations: [],
+      accountMap: {}
     }
   },
   methods: {
     getAccountInfo() {
       axios
         .get(`/account/${this.account.apiKey}`)
-        .then(response => (this.account = response.data))
+        .then(response => {
+          this.account = response.data;
+          this.accountMap[this.account.id.substr(14)] = this.account.name;
+        })
         .catch(error => this.error = error.message);
+    },
+    lookupAccount(accountId) {
+      return this.accountMap[accountId.substr(14)];
     },
     updatePackage(packageObj) {
       axios
@@ -63,6 +75,10 @@ export default {
       .get('/allowlists', {})
       .then(response => (this.integrations = response.data))
       .catch(error => this.error = error.message);
+
+    axios.get('/accountMap')
+        .then(response => (this.accountMap = response.data))
+        .catch(error => this.error = error.message);
   }
 }
 </script>

@@ -1,3 +1,4 @@
+const fs = require("fs");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -44,20 +45,40 @@ async function api(method, environment, resourcePath, data, res, apiKey) {
   }
   try {
     result = await axios(config);
-    res.send(result.data);
+    if(res) {
+      res.send(result.data);
+    }
+    else {
+      return result.data;
+    }
   }
   catch (e) {
     console.error(`error: ${e}`)
-    res.status(e.response.status).send(e.message);
+    if(res) {
+      res.status(e.response.status).send(e.message);
+    }
+    else {
+      return e;
+    }
   }
 }
 
 async function getData(environment, resourcePath, res, apiKey = process.env.LC_API_SUPER) {
-  api('get', environment, resourcePath, {}, res, apiKey);
+  return api('get', environment, resourcePath, {}, res, apiKey);
 }
 
 async function putData(environment, resourcePath, data, res, apiKey = process.env.LC_API_SUPER) {
   api('put', environment, resourcePath, data, res, apiKey);
+}
+
+function cachePath(env = TEMP_ENV) {
+  return `${__dirname}/app/cache/${env}.json`;
+}
+
+function updateAccountCache(id, name) {
+  const cache = require(cachePath());
+  cache[id.substr(14)] = name;
+  fs.writeFileSync(cachePath(), JSON.stringify(cache, null, 2));
 }
 
 app.get('/', function (req,res) {
@@ -65,7 +86,9 @@ app.get('/', function (req,res) {
 });
 
 app.get('/account/:apiKey', async (req, res) => {
-  await getData(TEMP_ENV, 'account', res, req.params.apiKey);
+  const data = await getData(TEMP_ENV, 'account', null, req.params.apiKey);
+  updateAccountCache(data.id, data.name);
+  res.send(data);
 })
 
 app.get('/allowlists', async (req, res) => {
@@ -75,6 +98,10 @@ app.get('/allowlists', async (req, res) => {
 app.get('/entities', async (req, res) => {
   await getData(TEMP_ENV, 'entities', res);
 })
+
+app.get('/accountMap', function (req, res) {
+  res.sendFile(`${cachePath(TEMP_ENV)}`);
+});
 
 app.put('/packages/:packageId', async (req, res) => {
   const data = {
