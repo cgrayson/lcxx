@@ -12,7 +12,18 @@
     </div>
 
     <div style="border: dashed green; margin-top: 2em; padding: 1em; text-align: left;">
-      {{ actionStatus }}
+      {{ actionStatus }}<br/>
+      <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
+      <label for="local">local</label>
+      <br>
+      <input type="radio" id="development" value="development" v-model="environment" @change="changeEnv">
+      <label for="development">development</label>
+      <br>
+      <input type="radio" id="staging" value="staging" v-model="environment" @change="changeEnv">
+      <label for="staging">staging</label>
+      <br>
+      <input type="radio" id="production" value="production" v-model="environment" @change="changeEnv">
+      <label for="production">production</label>
     </div>
   </div>
 
@@ -45,12 +56,18 @@ export default {
         id: '-',
         name: '-'
       },
+      environment: null,
       error: null,
       integrations: [],
       accountMap: {}
     }
   },
   methods: {
+    changeEnv() {
+      axios
+        .put(`/environment/${this.environment}`)
+        .catch(error => this.error = error.message);
+    },
     getAccountInfo() {
       axios
         .get(`/account/${this.account.apiKey}`)
@@ -71,6 +88,10 @@ export default {
     }
   },
   mounted () {
+    axios.get('/environment')
+        .then(response => (this.environment = response.data.env))
+        .catch(error => this.error = error.message);
+
     axios
       .get('/allowlists', {})
       .then(response => (this.integrations = response.data))
