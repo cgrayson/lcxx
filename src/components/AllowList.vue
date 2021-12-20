@@ -1,6 +1,6 @@
 <template>
   <div v-if="error" class="error">{{ error }}</div>
-  <div style="float: left; width: 25%;">
+  <div class="nav-controls">
     <div style="border: dashed green; padding: 1em; text-align: left;">
       {{ actionStatus }}<br/>
       <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
@@ -20,29 +20,35 @@
       <label>
         <input type="text" v-model="account.apiKey" style="width: 90%;" placeholder="account API key"/>
       </label><br/>
-      <button @click="getAccountInfo" style="margin-top: 0.5em;">look up account</button><br/>
+      <button @click="getAccountInfo" v-bind:disabled="!account.apiKey">look up account</button>
+      <br/>
       <div v-if="account.id">
         ID: <code>{{ account.id }}</code><br/>
         name: {{ account.name }}<br/>
+        <button @click="addAccountToSelected(account.id)">add to allowlist</button>
       </div>
     </div>
 
-    <div>
+    <div class="integration-list">
       <div v-for="integration in integrations" :key="integration.id">
         <div @click="select(integration)">{{ integration.id }} ({{ integration.account_ids.length }})</div>
       </div>
     </div>
   </div>
 
-  <div v-if="selected">
-    <h2>{{ selected.id }}</h2>
-    <textarea id="story" name="story" rows="5" cols="33" v-model="selected.account_ids" />
-    <button @click="updatePackage(selected)">update</button>
+  <div v-if="selected.id" class="view-allowlist">
     <div>
-      <ol>
-        <li v-for="id in selected.account_ids" :key="id">{{ id }} = {{ lookupAccount(id) }}</li>
-      </ol>
+      <button @click="updatePackage()" v-bind:disabled="!selected.dirty">save changes</button>
+      <h2>{{ selected.id }}</h2>
     </div>
+    <table>
+      <tr><th>LC Account ID</th><th>Account Name</th><th>&nbsp;</th></tr>
+      <tr v-for="id in selected.account_ids" :key="id">
+        <td>{{ id }}</td>
+        <td>{{ lookupAccount(id) || 'unknown' }}</td>
+        <td> &nbsp; </td>
+      </tr>
+    </table>
   </div>
 </template>
 
@@ -55,7 +61,7 @@ export default {
     return {
       actionStatus: null,
       account: {
-        apiKey: null,
+        apiKey: '5771bbd5fc4aae6796b8d14f85fe6a71',
         id: null,
         name: null
       },
@@ -67,6 +73,12 @@ export default {
     }
   },
   methods: {
+    addAccountToSelected(accountId) {
+      if(this.selected.account_ids) {
+        this.selected.account_ids.push(accountId);
+        this.selected.dirty = true;
+      }
+    },
     changeEnv() {
       axios
         .put(`/environment/${this.environment}`)
@@ -92,16 +104,18 @@ export default {
 
       axios
           .get('/allowlists', {})
-          .then(response => (this.integrations = response.data))
+          .then(response => { this.integrations = response.data; this.selected = this.integrations[1]; })
           .catch(error => this.error = error.message);
     },
     select(integration) {
       this.selected = integration;
     },
-    updatePackage(packageObj) {
+    updatePackage() {
+      const accountIds = this.selected.account_ids;
+      console.log('ok? ' + JSON.stringify(accountIds))
       axios
-        .put(`/packages/${packageObj.id}`, { accountIds: packageObj.account_ids })
-        .then(response => (this.actionStatus = response.status === 200 ? packageObj.id + ' updated' : 'uh-oh :-('))
+        .put(`/packages/${this.selected.id}`, { accountIds: accountIds })
+        .then(response => (this.actionStatus = response.status === 200 ? this.selected.id + ' updated' : 'uh-oh :-('))
         .catch(error => this.actionStatus = 'uh-oh! ' + error.message);
     }
   },
@@ -114,3 +128,28 @@ export default {
   }
 }
 </script>
+
+<style>
+.integration-list {
+  text-align: left;
+}
+.nav-controls {
+  float: left;
+  width: 25%;
+}
+.nav-controls button {
+  margin: 0.5em 0.5em 0 0;
+}
+.view-allowlist {
+  float: left;
+  margin-left: 4em;
+  text-align: left;
+  width: 40%;
+}
+.view-allowlist button {
+  float: right;
+}
+.view-allowlist td {
+  padding: 4px;
+}
+</style>

@@ -11,7 +11,7 @@ if (!process.env.LC_API_SUPER) {
   process.exit(2);
 }
 
-let lcEnv = 'development';
+let lcEnv = 'local';
 
 const app = express();
 app.use(express.static(path));
@@ -119,7 +119,7 @@ app.get('/accountMap', function (req, res) {
 app.put('/packages/:packageId', async (req, res) => {
   const data = {
     id: req.params.packageId,
-    account_ids: req.body.accountIds.split(',')
+    account_ids: req.body.accountIds
   };
   await putData(lcEnv, `packages/allowlist/${req.params.packageId}`, data, res);
 });
