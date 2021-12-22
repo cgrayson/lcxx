@@ -1,8 +1,8 @@
 <template>
   <div v-if="error" class="error">{{ error }}</div>
   <div class="nav-controls">
-    <div style="border: dashed green; padding: 1em; text-align: left;">
-      {{ actionStatus }}<br/>
+    <div>
+      <h2>environment</h2>
       <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
       <label for="local">local</label>
       <br>
@@ -16,7 +16,8 @@
       <label for="production">production</label>
     </div>
 
-    <div style="border: solid gold; margin-top: 1em; padding: 1em; text-align: left;">
+    <div>
+      <h2>account lookup</h2>
       <label>
         <input type="text" v-model="account.apiKey" style="width: 90%;" placeholder="account API key"/>
       </label><br/>
@@ -26,13 +27,17 @@
       <div v-else-if="account.id">
         ID: <code>{{ account.id }}</code><br/>
         name: {{ account.name }}<br/>
-        <button @click="addAccountToSelected(account.id)">add to allowlist</button>
+        <button @click="addAccountToSelected(account.id)">add to allowlist &gt;&gt;</button>
       </div>
     </div>
 
     <div class="integration-list">
+      <h2>integrations</h2>
       <div v-for="integration in integrations" :key="integration.id">
-        <div @click="select(integration)">{{ integration.id }} ({{ integration.account_ids.length }})</div>
+        <div @click="select(integration)">
+          <a href="javascript:">{{ integration.id }}</a>
+          ({{ integration.account_ids.length }})
+        </div>
       </div>
     </div>
   </div>
@@ -42,6 +47,7 @@
       <button @click="updatePackage()" v-bind:disabled="!selected.dirty">save changes</button>
       <h2>{{ selected.id }}</h2>
     </div>
+    <div class="udpateStatus">&nbsp; {{ actionStatus }}</div>
     <table>
       <thead>
         <tr><th>LC Account ID</th><th>Account Name</th><th>&nbsp;</th></tr>
@@ -66,7 +72,7 @@ export default {
     return {
       actionStatus: null,
       account: {
-        apiKey: '5771bbd5fc4aae6796b8d14f85fe6a71',
+        apiKey: '',
         id: null,
         name: null,
         error: null
@@ -128,6 +134,7 @@ export default {
         .then(response => {
           this.actionStatus = response.status === 200 ? this.selected.id + ' updated' : 'uh-oh :-(';
           this.selected.dirty = false;
+          setTimeout(() => { this.actionStatus = null; }, 5000);
         })
         .catch(error => this.actionStatus = 'uh-oh! ' + error.message);
     }
@@ -150,22 +157,34 @@ export default {
   text-align: left;
 }
 .nav-controls {
+  border: solid lightblue;
   float: left;
-  width: 25%;
+  padding: 0.5em;
+  text-align: left;
+  width: 35%;
 }
 .nav-controls button {
   margin: 0.5em 0.5em 0 0;
+}
+.nav-controls h2 {
+  margin-bottom: 0;
 }
 .view-allowlist {
   float: left;
   margin-left: 4em;
   text-align: left;
-  width: 40%;
+  width: 50%;
 }
 .view-allowlist button {
   float: right;
 }
 .view-allowlist td {
   padding: 4px;
+}
+.udpateStatus {
+  color: green;
+  font-style: italic;
+  font-weight: bold;
+  text-align: center;
 }
 </style>

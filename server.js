@@ -66,7 +66,7 @@ async function api(method, environment, resourcePath, data, res, apiKey) {
 }
 
 async function getData(environment, resourcePath, res, apiKey = process.env.LC_API_SUPER) {
-  console.log(`getting ${resourcePath} from ${lcEnv}`);
+  // console.log(`getting ${resourcePath} from ${lcEnv}`);
   return api('get', environment, resourcePath, {}, res, apiKey);
 }
 
