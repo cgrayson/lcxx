@@ -1,7 +1,7 @@
 <template>
-  <div v-if="error" class="error">{{ error }}</div>
   <div class="nav-controls">
     <div>
+      <div v-if="error" class="error">{{ error }}</div>
       <h2>environment</h2>
       <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
       <label for="local">local</label>
@@ -56,7 +56,9 @@
         <tr v-for="id in selected.account_ids" :key="id" v-bind:class="{ 'already-allowlisted': alreadyListed(id) }">
           <td><code>{{ id }}</code></td>
           <td>{{ lookupAccount(id) || '-- ? --' }}</td>
-          <td> &nbsp; </td>
+          <td>
+            <button @click="removeAccount(id)" >del</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -95,6 +97,7 @@ export default {
       }
     },
     changeEnv() {
+      this.error = null;
       axios.put(`/environment/${this.environment}`)
         .catch(error => this.error = error.message);
       this.loadData();
@@ -124,6 +127,10 @@ export default {
       axios.get('/allowlists', {})
           .then(response => { this.integrations = response.data; this.selected = this.integrations[1]; })
           .catch(error => this.error = error.message);
+    },
+    removeAccount(accountId) {
+      this.selected.account_ids.splice(this.selected.account_ids.indexOf(accountId), 1);
+      this.selected.dirty = true;
     },
     select(integration) {
       this.selected = integration;
