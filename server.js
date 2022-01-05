@@ -7,11 +7,11 @@ const axios = require("axios");
 const path = __dirname + '/app/views/';
 
 if (!process.env.LC_API_SUPER) {
-  console.log('Required env var LC_API not set');
+  console.log('Required env var LC_API_SUPER not set');
   process.exit(2);
 }
 
-let lcEnv = 'local';
+let lcEnv = 'development';
 
 const app = express();
 app.use(express.static(path));

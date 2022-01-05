@@ -9,7 +9,7 @@
     "build": "vue-cli-service build --dest app/views",
     "watch": "vue-cli-service build --dest app/views --watch",
     "lint": "vue-cli-service lint",
-    "start": "open http://localhost:8080 ; node server.js",
+    "start": "(sleep 1; open http://localhost:8080) & node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "main": "app.js",
