@@ -1,16 +1,17 @@
 <template>
+  <HelloWorld/>
   <AllowList/>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
+import HelloWorld from './components/HelloWorld.vue'
 import AllowList from './components/AllowList.vue'
 
 export default {
   name: 'App',
   components: {
     AllowList,
-    // HelloWorld
+    HelloWorld
   }
 }
 </script>
