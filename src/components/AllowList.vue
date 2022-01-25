@@ -1,67 +1,73 @@
 <template>
-  <div class="nav-controls">
-    <div>
-      <div v-if="error" class="error">{{ error }}</div>
-      <h2>environment</h2>
-      <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
-      <label for="local">local</label>
-      <br>
-      <input type="radio" id="development" value="development" v-model="environment" @change="changeEnv">
-      <label for="development">development</label>
-      <br>
-      <input type="radio" id="staging" value="staging" v-model="environment" @change="changeEnv">
-      <label for="staging">staging</label>
-      <br>
-      <input type="radio" id="production" value="production" v-model="environment" @change="changeEnv">
-      <label for="production">production</label>
-    </div>
-
-    <div>
-      <h2>account lookup</h2>
-      <label>
-        <input type="text" v-model="account.apiKey" style="width: 90%;" placeholder="account API key"/>
-      </label><br/>
-      <button @click="getAccountInfo" v-bind:disabled="!account.apiKey">look up account</button>
-      <br/>
-      <div v-if="account.error" class="error">{{ account.error }}</div>
-      <div v-else-if="account.id">
-        ID: <code>{{ account.id }}</code><br/>
-        name: {{ account.name }}<br/>
-        <button @click="addAccountToSelected(account.id)">add to allowlist &gt;&gt;</button>
+  <div class="row">
+    <div class="col-4 nav-controls">
+      <div>
+        <div v-if="error" class="error">{{ error }}</div>
+        <h2>environment</h2>
+        <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
+        <label for="local">local</label>
+        <br>
+        <input type="radio" id="development" value="development" v-model="environment" @change="changeEnv">
+        <label for="development">development</label>
+        <br>
+        <input type="radio" id="staging" value="staging" v-model="environment" @change="changeEnv">
+        <label for="staging">staging</label>
+        <br>
+        <input type="radio" id="production" value="production" v-model="environment" @change="changeEnv">
+        <label for="production">production</label>
       </div>
-    </div>
 
-    <div class="integration-list">
-      <h2>integrations</h2>
-      <div v-for="integration in integrations" :key="integration.id">
-        <div @click="select(integration)">
-          <a href="javascript:">{{ integration.id }}</a>
-          ({{ integration.account_ids.length }})
+      <div>
+        <h2>account lookup</h2>
+        <label>
+          <input type="text" v-model="account.apiKey" style="width: 90%;" placeholder="account API key"/>
+        </label><br/>
+        <button @click="getAccountInfo" v-bind:disabled="!account.apiKey">look up account</button>
+        <br/>
+        <div v-if="account.error" class="error">{{ account.error }}</div>
+        <div v-else-if="account.id">
+          ID: <code>{{ account.id }}</code><br/>
+          name: {{ account.name }}<br/>
+          <button @click="addAccountToSelected(account.id)">add to allowlist &gt;&gt;</button>
+        </div>
+      </div>
+
+      <div class="integration-list">
+        <h2>integrations</h2>
+        <div v-for="integration in integrations" :key="integration.id">
+          <div @click="select(integration)">
+            <a href="javascript:">{{ integration.id }}</a>
+            ({{ integration.account_ids.length }})
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <div v-if="selected.id" class="view-allowlist">
-    <div>
-      <button @click="updatePackage()" v-bind:disabled="!selected.dirty">save changes</button>
-      <h2>{{ selected.id }}</h2>
+    <div class="col-1">
+      &nbsp;
     </div>
-    <div class="udpateStatus">&nbsp; {{ actionStatus }}</div>
-    <table>
-      <thead>
-        <tr><th>LC Account ID</th><th>Account Name</th><th>&nbsp;</th></tr>
-      </thead>
-      <tbody>
-        <tr v-for="id in selected.account_ids" :key="id" v-bind:class="{ 'already-allowlisted': alreadyListed(id) }">
-          <td><code>{{ id }}</code></td>
-          <td>{{ lookupAccount(id) || '-- ? --' }}</td>
-          <td>
-            <button @click="removeAccount(id)" >del</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-if="selected.id" class="col-7 view-allowlist">
+      <div>
+        <button @click="updatePackage()" v-bind:disabled="!selected.dirty" class="btn-primary">save changes</button>
+        <h2>{{ selected.id }}</h2>
+      </div>
+      <div class="udpateStatus">&nbsp; {{ actionStatus }}</div>
+      <table>
+        <thead>
+          <tr><th>LC Account ID</th><th>Account Name</th><th>&nbsp;</th></tr>
+        </thead>
+        <tbody>
+          <tr v-for="id in selected.account_ids" :key="id" v-bind:class="{ 'already-allowlisted': alreadyListed(id) }">
+            <td><code class="bg-gray-200 text-gray-900">{{ id }}</code></td>
+            <td>{{ lookupAccount(id) || '-- ? --' }}</td>
+            <td>
+              <button @click="removeAccount(id)" class="btn-xsmall text-orange-900 bg-orange-200">
+                remove
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -165,10 +171,8 @@ export default {
 }
 .nav-controls {
   border: solid lightblue;
-  float: left;
   padding: 0.5em;
   text-align: left;
-  width: 35%;
 }
 .nav-controls button {
   margin: 0.5em 0.5em 0 0;
@@ -177,10 +181,8 @@ export default {
   margin-bottom: 0;
 }
 .view-allowlist {
-  float: left;
   margin-left: 4em;
   text-align: left;
-  width: 50%;
 }
 .view-allowlist button {
   float: right;
