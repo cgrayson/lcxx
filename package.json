@@ -7,10 +7,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --dest app/views",
-    "watch": "vue-cli-service build --dest app/views --watch",
     "lint": "vue-cli-service lint",
     "start": "(sleep 1; open http://localhost:8080) & node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "vue-cli-service build --dest app/views --watch"
   },
   "main": "app.js",
   "dependencies": {
@@ -20,11 +20,12 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "vue": "^3.0.0",
-    "vue-router": "^3.5.3"
+    "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "^4.5.15",
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
     "babel-eslint": "^10.1.0",
