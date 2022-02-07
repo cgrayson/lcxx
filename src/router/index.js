@@ -1,11 +1,18 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import Home from '../views/Home.vue'
+import { createRouter, createWebHashHistory } from 'vue-router';
+import AllowList from '../components/AllowList.vue';
+import HelloWorld from '../components/HelloWorld';
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    name: 'AllowList',
+    component: AllowList
+  },
+  {
+    path: '/hello',
+    name: 'Hello, World',
+    component: HelloWorld,
+    props: { msg: 'Bob' }
   },
   {
     path: '/about',

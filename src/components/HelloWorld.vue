@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 
 export default {
   name: 'HelloWorld',
@@ -15,15 +14,8 @@ export default {
   },
   data () {
     return {
-      error: null,
-      entities: []
+      error: null
     }
-  },
-  mounted () {
-    axios
-      .get('/entities', {})
-      .then(response => (this.entities = response.data))
-      .catch(error => this.error = JSON.stringify(error));
   }
 }
 </script>

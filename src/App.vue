@@ -1,7 +1,16 @@
 <template>
-  <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+  <div id="nav" class="tab-container tabs-classic">
+    <ul>
+      <li class="tab-item-content">
+        <router-link to="/">AllowLists</router-link>
+      </li>
+      <li class="tab-item-content">
+        <router-link to="/hello">Hello World</router-link>
+      </li>
+      <li class="tab-item-content">
+        <router-link to="/about">About</router-link>
+      </li>
+    </ul>
   </div>
   <router-view/>
 </template>

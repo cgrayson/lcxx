@@ -1,11 +1,4 @@
 <template>
-  <div class="tab-container tabs-classic">
-    <ul>
-      <li><div class="tab-item-content">Hello World</div></li>
-      <li class="selected"><div class="tab-item-content">Allow Lists</div></li>
-    </ul>
-  </div>
-
   <div class="row">
     <div class="col-4 nav-controls">
       <div>
