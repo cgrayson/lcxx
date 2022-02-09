@@ -11,7 +11,7 @@ if (!process.env.LC_API_SUPER) {
   process.exit(2);
 }
 
-let lcEnv = 'development';
+let lcEnv = 'local';
 
 const app = express();
 app.use(express.static(path));
@@ -66,12 +66,15 @@ async function api(method, environment, resourcePath, data, res, apiKey) {
 }
 
 async function getData(environment, resourcePath, res, apiKey = process.env.LC_API_SUPER) {
-  // console.log(`getting ${resourcePath} from ${lcEnv}`);
   return api('get', environment, resourcePath, {}, res, apiKey);
 }
 
 async function putData(environment, resourcePath, data, res, apiKey = process.env.LC_API_SUPER) {
   api('put', environment, resourcePath, data, res, apiKey);
+}
+
+async function deleteData(environment, resourcePath, res, apiKey = process.env.LC_API_SUPER) {
+  api('delete', environment, resourcePath, {}, res, apiKey);
 }
 
 function cachePath(env = lcEnv) {
@@ -122,6 +125,10 @@ app.put('/packages/:packageId', async (req, res) => {
     account_ids: req.body.accountIds
   };
   await putData(lcEnv, `packages/allowlist/${req.params.packageId}`, data, res);
+});
+
+app.delete('/packages/:packageId', async (req, res) => {
+  await deleteData(lcEnv, `packages/allowlist/${req.params.packageId}`, res);
 });
 
 const PORT = process.env.PORT || 8080;

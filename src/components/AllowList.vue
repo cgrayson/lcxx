@@ -30,6 +30,7 @@
           name: {{ account.name }}<br/>
           <button @click="addAccountToSelected(account.id)">add to allowlist &gt;&gt;</button>
         </div>
+        <button @click="addAccountToSelected('public')">add 'public' to allowlist &gt;&gt;</button>
       </div>
 
       <div class="integration-list">
@@ -43,30 +44,39 @@
       </div>
     </div>
     <div class="col-1">
-      &nbsp;
+
     </div>
     <div v-if="selected.id" class="col-7 view-allowlist">
       <div>
-        <button @click="updatePackage()" v-bind:disabled="!selected.dirty" class="btn-primary">save changes</button>
+        <button @click="updatePackage()" v-bind:disabled="!selected.dirty" class="btn-info">save changes</button><br/>
         <h2>{{ selected.id }}</h2>
       </div>
       <div class="udpateStatus">&nbsp; {{ actionStatus }}</div>
-      <table>
-        <thead>
-          <tr><th>LC Account ID</th><th>Account Name</th><th>&nbsp;</th></tr>
-        </thead>
-        <tbody>
-          <tr v-for="id in selected.account_ids" :key="id" v-bind:class="{ 'already-allowlisted': alreadyListed(id) }">
-            <td><code class="bg-gray-200 text-gray-900">{{ id }}</code></td>
-            <td>{{ lookupAccount(id) || '-- ? --' }}</td>
-            <td>
-              <button @click="removeAccount(id)" class="btn-xsmall text-orange-900 bg-orange-200">
-                remove
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-if="selected.account_ids.length">
+        <table>
+          <thead>
+            <tr><th>LC Account ID</th><th>Account Name</th><th>&nbsp;</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="id in selected.account_ids" :key="id" v-bind:class="{ 'already-allowlisted': alreadyListed(id) }">
+              <td><code class="bg-gray-200 text-gray-900">{{ id }}</code></td>
+              <td>{{ lookupAccount(id) || '-- ? --' }}</td>
+              <td>
+                <button @click="removeAccount(id)" class="btn-xsmall text-orange-900 bg-orange-200">
+                  remove
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div v-else class="text-warning u-text-center">
+        <h3>Warning</h3>
+        <p style="font-weight: bold;">An allowlist with no accounts will make this integration inaccessible to everyone.</p>
+      </div>
+
+      <button @click="deletePackage()" class="outline btn-danger">delete</button>
     </div>
   </div>
 </template>
@@ -131,7 +141,7 @@ export default {
           .catch(error => this.error = error.message);
 
       axios.get('/allowlists', {})
-          .then(response => { this.integrations = response.data; this.selected = this.integrations[1]; })
+          .then(response => { this.integrations = response.data; this.selected = this.integrations[0]; })
           .catch(error => this.error = error.message);
     },
     removeAccount(accountId) {
@@ -140,6 +150,18 @@ export default {
     },
     select(integration) {
       this.selected = integration;
+    },
+    deletePackage() {
+      var sure = confirm('Are you sure you want to delete this allowlist completely?');
+      if (sure) {
+        axios.delete(`/packages/${this.selected.id}`)
+            .then(response => {
+              this.actionStatus = response.status === 200 ? this.selected.id + ' deleted' : 'uh-oh :-(';
+              setTimeout(() => { this.actionStatus = null; }, 5000);
+              this.loadData();
+            })
+            .catch(error => this.actionStatus = 'uh-oh! ' + error.message);
+      }
     },
     updatePackage() {
       const accountIds = this.selected.account_ids;
