@@ -77,6 +77,10 @@ async function deleteData(environment, resourcePath, res, apiKey = process.env.L
   api('delete', environment, resourcePath, {}, res, apiKey);
 }
 
+async function postData(environment, resourcePath, data, res, apiKey = process.env.LC_API_SUPER) {
+  api('post', environment, resourcePath, data, res, apiKey);
+}
+
 function cachePath(env = lcEnv) {
   return `${__dirname}/app/cache/${env}.json`;
 }
@@ -117,6 +121,14 @@ app.get('/entities', async (req, res) => {
 
 app.get('/accountMap', function (req, res) {
   res.sendFile(`${cachePath(lcEnv)}`);
+});
+
+app.post('/packages/:packageId', async (req, res) => {
+  const data = {
+    id: req.params.packageId,
+    account_ids: []
+  };
+  await postData(lcEnv, `packages/allowlist/${req.params.packageId}`, data, res);
 });
 
 app.put('/packages/:packageId', async (req, res) => {

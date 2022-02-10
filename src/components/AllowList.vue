@@ -42,6 +42,11 @@
           </div>
         </div>
       </div>
+
+      <div style="padding-top: 1em;">
+        <input type="text" v-model="newPackageName" style="width: 90%;"/>
+        <button @click="addPackage()" class="btn-info" v-bind:disabled="newPackageName === 'leadconduit-'">add new</button><br/>
+      </div>
     </div>
     <div class="col-1">
 
@@ -99,7 +104,8 @@ export default {
       error: null,
       integrations: [],
       accountMap: {},
-      selected: {}
+      selected: {},
+      newPackageName: 'leadconduit-'
     }
   },
   methods: {
@@ -136,6 +142,8 @@ export default {
       return this.accountMap[accountId.substr(14)];
     },
     loadData() {
+      this.selected.dirty = false;
+      this.newPackageName = 'leadconduit-';
       axios.get('/accountMap')
           .then(response => (this.accountMap = response.data))
           .catch(error => this.error = error.message);
@@ -150,6 +158,15 @@ export default {
     },
     select(integration) {
       this.selected = integration;
+    },
+    addPackage() {
+      axios.post(`/packages/${this.newPackageName}`)
+          .then(response => {
+            this.actionStatus = response.status === 200 ? this.newPackageName + ' created' : 'uh-oh :-(';
+            setTimeout(() => { this.actionStatus = null; }, 5000);
+            this.loadData();
+          })
+          .catch(error => this.actionStatus = 'uh-oh! ' + error.message);
     },
     deletePackage() {
       var sure = confirm('Are you sure you want to delete this allowlist completely?');
