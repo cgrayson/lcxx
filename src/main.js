@@ -1,5 +1,25 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { createStore } from 'vuex'
 
-createApp(App).use(router).mount('#app')
+// Create a new store instance.
+const store = createStore({
+  state () {
+    return {
+      statusMsg: '',
+      statusIsError: false
+    }
+  },
+  mutations: {
+    flashMessage (state, { message, error, erase }) {
+      state.statusMsg = message;
+      state.statusIsError = error;
+      if (erase) {
+        setTimeout(() => { state.statusMsg = '' }, 6000);
+      }
+    }
+  }
+})
+
+createApp(App).use(store).use(router).mount('#app')

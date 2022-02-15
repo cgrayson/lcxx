@@ -2,7 +2,6 @@
   <div class="row">
     <div class="col-4 nav-controls">
       <div>
-        <div v-if="error" class="error">{{ error }}</div>
         <h2>environment</h2>
         <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
         <label for="local">local</label>
@@ -56,7 +55,6 @@
         <button @click="updatePackage()" v-bind:disabled="!selected.dirty" class="btn-info">save changes</button><br/>
         <h2>{{ selected.id }}</h2>
       </div>
-      <div class="udpateStatus">&nbsp; {{ actionStatus }}</div>
       <div v-if="selected.account_ids.length">
         <table>
           <thead>
@@ -93,7 +91,6 @@ export default {
   name: 'AllowList',
   data () {
     return {
-      actionStatus: null,
       account: {
         apiKey: '',
         id: null,
@@ -101,7 +98,6 @@ export default {
         error: null
       },
       environment: null,
-      error: null,
       integrations: [],
       accountMap: {},
       selected: {},
@@ -119,10 +115,15 @@ export default {
       }
     },
     changeEnv() {
-      this.error = null;
       axios.put(`/environment/${this.environment}`)
-        .catch(error => this.error = error.message);
+        .catch(error => this.flashError(error.message));
       this.loadData();
+    },
+    flashError(message) {
+      this.flashMessage(message, true);
+    },
+    flashMessage(message, error = false, erase = true) {
+      this.$store.commit('flashMessage', { message, error, erase });
     },
     getAccountInfo() {
       axios.get(`/account/${this.account.apiKey}`)
@@ -136,7 +137,7 @@ export default {
             this.account.error = response.data.message || 'Error getting account info';
           }
         })
-        .catch(error => this.error = error.message);
+        .catch(error => this.flashError(error.message));
     },
     lookupAccount(accountId = '') {
       return this.accountMap[accountId.substr(14)];
@@ -146,11 +147,11 @@ export default {
       this.newPackageName = 'leadconduit-';
       axios.get('/accountMap')
           .then(response => (this.accountMap = response.data))
-          .catch(error => this.error = error.message);
+          .catch(error => this.flashError(error.message));
 
       axios.get('/allowlists', {})
           .then(response => { this.integrations = response.data; this.selected = this.integrations[0]; })
-          .catch(error => this.error = error.message);
+          .catch(error => this.flashError(error.message));
     },
     removeAccount(accountId) {
       this.selected.account_ids.splice(this.selected.account_ids.indexOf(accountId), 1);
@@ -162,39 +163,36 @@ export default {
     addPackage() {
       axios.post(`/packages/${this.newPackageName}`)
           .then(response => {
-            this.actionStatus = response.status === 200 ? this.newPackageName + ' created' : 'uh-oh :-(';
-            setTimeout(() => { this.actionStatus = null; }, 5000);
+            this.flashMessage(response.status === 200 ? this.newPackageName + ' created' : 'uh-oh :-(');
             this.loadData();
           })
-          .catch(error => this.actionStatus = 'uh-oh! ' + error.message);
+          .catch(error => this.flashError(error.message));
     },
     deletePackage() {
       var sure = confirm('Are you sure you want to delete this allowlist completely?');
       if (sure) {
         axios.delete(`/packages/${this.selected.id}`)
             .then(response => {
-              this.actionStatus = response.status === 200 ? this.selected.id + ' deleted' : 'uh-oh :-(';
-              setTimeout(() => { this.actionStatus = null; }, 5000);
+              this.flashMessage(response.status === 200 ? this.selected.id + ' deleted' : 'uh-oh :-(');
               this.loadData();
             })
-            .catch(error => this.actionStatus = 'uh-oh! ' + error.message);
+            .catch(error => this.flashError(error.message));
       }
     },
     updatePackage() {
       const accountIds = this.selected.account_ids;
       axios.put(`/packages/${this.selected.id}`, { accountIds: accountIds })
         .then(response => {
-          this.actionStatus = response.status === 200 ? this.selected.id + ' updated' : 'uh-oh :-(';
+          this.flashMessage(response.status === 200 ? this.selected.id + ' updated' : 'uh-oh :-(');
           this.selected.dirty = false;
-          setTimeout(() => { this.actionStatus = null; }, 5000);
         })
-        .catch(error => this.actionStatus = 'uh-oh! ' + error.message);
+        .catch(error => this.flashError(error.message));
     }
   },
   created () {
     axios.get('/environment')
         .then(response => (this.environment = response.data.env))
-        .catch(error => this.error = error.message);
+        .catch(error => this.flashError(error.message));
 
     this.loadData();
   }
@@ -228,11 +226,5 @@ export default {
 }
 .view-allowlist td {
   padding: 4px;
-}
-.udpateStatus {
-  color: green;
-  font-style: italic;
-  font-weight: bold;
-  text-align: center;
 }
 </style>
