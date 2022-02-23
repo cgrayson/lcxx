@@ -20,16 +20,15 @@
         <h2>account lookup</h2>
         <label>
           <input type="text" v-model="account.apiKey" style="width: 90%;" placeholder="account API key"/>
-        </label><br/>
-        <button @click="getAccountInfo" v-bind:disabled="!account.apiKey">look up account</button>
+        </label>
+        <button @click="getAccountInfo" v-bind:disabled="!account.apiKey">search <i class="fa-wrapper fa fa-binoculars"></i></button>
         <br/>
-        <div v-if="account.error" class="error">{{ account.error }}</div>
-        <div v-else-if="account.id">
+        <div v-if="account.id">
           ID: <code>{{ account.id }}</code><br/>
           name: {{ account.name }}<br/>
-          <button @click="addAccountToSelected(account.id)">add to allowlist &gt;&gt;</button>
+          <button @click="addAccountToSelected(account.id)">add to allowlist <i class="fa-wrapper fa fa-arrow-right"></i></button>
         </div>
-        <button @click="addAccountToSelected('public')">add 'public' to allowlist &gt;&gt;</button>
+        <button @click="addAccountToSelected('public')">add 'public' to allowlist <i class="fa-wrapper fa fa-arrow-right"></i></button>
       </div>
 
       <div class="integration-list">
@@ -56,7 +55,7 @@
         <h2>{{ selected.id }}</h2>
       </div>
       <div v-if="selected.account_ids.length">
-        <table>
+        <table border="0">
           <thead>
             <tr><th>LC Account ID</th><th>Account Name</th><th>&nbsp;</th></tr>
           </thead>
@@ -94,8 +93,7 @@ export default {
       account: {
         apiKey: '',
         id: null,
-        name: null,
-        error: null
+        name: null
       },
       environment: null,
       integrations: [],
@@ -134,7 +132,7 @@ export default {
             this.accountMap[this.account.id.substr(14)] = this.account.name;
           }
           else {
-            this.account.error = response.data.message || 'Error getting account info';
+            this.flashError(response.data.status === 401 ? 'Account not found' : response.data.message || 'Error getting account info');
           }
         })
         .catch(error => this.flashError(error.message));
@@ -200,6 +198,9 @@ export default {
 </script>
 
 <style>
+table {
+  border-collapse: collapse;
+}
 .already-allowlisted {
   background-color: palegreen;
 }
