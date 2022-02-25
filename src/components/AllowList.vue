@@ -55,12 +55,13 @@
         <h2>{{ selected.id }}</h2>
       </div>
       <div v-if="selected.account_ids.length">
+        <input type="text" v-model="filterTerm" placeholder="filter by..."/>
         <table border="0">
           <thead>
             <tr><th>LC Account ID</th><th>Account Name</th><th>&nbsp;</th></tr>
           </thead>
           <tbody>
-            <tr v-for="id in selected.account_ids" :key="id" v-bind:class="{ 'already-allowlisted': alreadyListed(id) }">
+            <tr v-for="id in filteredAccounts" :key="id" v-bind:class="{ 'already-allowlisted': alreadyListed(id) }">
               <td><code class="bg-gray-200 text-gray-900">{{ id }}</code></td>
               <td>{{ lookupAccount(id) || '-- ? --' }}</td>
               <td>
@@ -99,7 +100,17 @@ export default {
       integrations: [],
       accountMap: {},
       selected: {},
-      newPackageName: 'leadconduit-'
+      newPackageName: 'leadconduit-',
+      filterTerm: ''
+    }
+  },
+  computed: {
+    filteredAccounts() {
+      return this.selected.account_ids.filter(id => {
+        if (id.includes(this.filterTerm)) return true;
+        const name = this.lookupAccount(id);
+        return (name && name.includes(this.filterTerm));
+      });
     }
   },
   methods: {
@@ -216,6 +227,7 @@ table {
   margin: 0.5em 0.5em 0 0;
 }
 .nav-controls h2 {
+  padding-top: 0.5em;
   margin-bottom: 0;
 }
 .view-allowlist {
