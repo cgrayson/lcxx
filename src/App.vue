@@ -1,16 +1,26 @@
 <template>
-  <AllowList/>
+  <div id="statusMsg" :class="{ error: statusIsError }">{{ statusMsg }}</div>
+  <div id="nav" class="tab-container tabs-classic">
+    <ul>
+      <li class="tab-item-content">
+        <router-link to="/">AllowLists</router-link>
+      </li>
+      <li class="tab-item-content">
+        <router-link to="/hello">Hello World</router-link>
+      </li>
+      <li class="tab-item-content">
+        <router-link to="/about">About</router-link>
+      </li>
+    </ul>
+  </div>
+  <router-view/>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
-import AllowList from './components/AllowList.vue'
-
 export default {
-  name: 'App',
-  components: {
-    AllowList,
-    // HelloWorld
+  computed: {
+    statusMsg () { return this.$store.state.statusMsg; },
+    statusIsError () { return this.$store.state.statusIsError; }
   }
 }
 </script>
@@ -22,10 +32,30 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
-.error {
-  color: red;
+
+#nav {
+  padding: 30px;
+}
+
+#nav a {
   font-weight: bold;
+  color: #2c3e50;
+}
+
+#nav a.router-link-exact-active {
+  color: #42b983;
+}
+
+#statusMsg {
+  color: green;
+  float: right;
+  font-weight: bold;
+  margin: 1em 2em 0 0;
+  padding: 5px 2em;
+}
+
+#statusMsg.error {
+  color: red;
 }
 </style>
