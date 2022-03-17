@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import AllowList from '../components/AllowList.vue';
+import Entities from '../views/EntityRecords.vue';
 import HelloWorld from '../components/HelloWorld';
 
 const routes = [
@@ -7,6 +8,11 @@ const routes = [
     path: '/',
     name: 'AllowList',
     component: AllowList
+  },
+  {
+    path: '/entities',
+    name: 'Entities',
+    component: Entities
   },
   {
     path: '/hello',

@@ -6,6 +6,9 @@
         <router-link to="/">AllowLists</router-link>
       </li>
       <li class="tab-item-content">
+        <router-link to="/entities">Entities</router-link>
+      </li>
+      <li class="tab-item-content">
         <router-link to="/hello">Hello World</router-link>
       </li>
       <li class="tab-item-content">

@@ -143,6 +143,18 @@ app.delete('/packages/:packageId', async (req, res) => {
   await deleteData(lcEnv, `packages/allowlist/${req.params.packageId}`, res);
 });
 
+app.post('/entities', async (req, res) => {
+  await postData(lcEnv, 'entities', req.body, res);
+});
+
+app.put('/entities/:entityId', async (req, res) => {
+  await putData(lcEnv, `entities/${req.params.entityId}`, req.body, res);
+});
+
+app.delete('/entities/:entityId', async (req, res) => {
+  await deleteData(lcEnv, `entities/${req.params.entityId}`, res);
+});
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);

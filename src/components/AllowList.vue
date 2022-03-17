@@ -124,6 +124,7 @@ export default {
       }
     },
     changeEnv() {
+      this.flashMessage(`changing env to: ${this.environment}`);
       axios.put(`/environment/${this.environment}`)
         .catch(error => this.flashError(error.message));
       this.loadData();
