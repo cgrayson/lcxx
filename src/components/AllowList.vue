@@ -1,20 +1,7 @@
 <template>
   <div class="row">
     <div class="col-4 nav-controls">
-      <div>
-        <h2>environment</h2>
-        <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
-        <label for="local">local</label>
-        <br>
-        <input type="radio" id="development" value="development" v-model="environment" @change="changeEnv">
-        <label for="development">development</label>
-        <br>
-        <input type="radio" id="staging" value="staging" v-model="environment" @change="changeEnv">
-        <label for="staging">staging</label>
-        <br>
-        <input type="radio" id="production" value="production" v-model="environment" @change="changeEnv">
-        <label for="production">production</label>
-      </div>
+      <Environment />
 
       <div>
         <h2>account lookup</h2>
@@ -86,9 +73,13 @@
 
 <script>
 import axios from 'axios';
+import Environment from './Environment.vue'
 
 export default {
   name: 'AllowList',
+  components: {
+    Environment
+  },
   data () {
     return {
       account: {
@@ -122,12 +113,6 @@ export default {
         this.selected.account_ids.push(accountId);
         this.selected.dirty = true;
       }
-    },
-    changeEnv() {
-      this.flashMessage(`changing env to: ${this.environment}`);
-      axios.put(`/environment/${this.environment}`)
-        .catch(error => this.flashError(error.message));
-      this.loadData();
     },
     flashError(message) {
       this.flashMessage(message, true);

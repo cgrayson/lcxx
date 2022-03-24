@@ -7,6 +7,7 @@ import { createStore } from 'vuex'
 const store = createStore({
   state () {
     return {
+      environment: null,
       statusMsg: '',
       statusIsError: false
     }
