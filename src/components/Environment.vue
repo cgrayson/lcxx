@@ -30,7 +30,7 @@ export default {
       this.flashMessage(`changing env to: ${this.environment}`);
       axios.put(`/environment/${this.environment}`)
           .catch(error => this.flashError(error.message));
-      // this.loadData();
+      this.$store.commit('changeEnv', this.environment);
     },
     flashError(message) {
       this.flashMessage(message, true);

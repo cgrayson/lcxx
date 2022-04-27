@@ -87,7 +87,6 @@ export default {
         id: null,
         name: null
       },
-      environment: null,
       integrations: [],
       accountMap: {},
       selected: {},
@@ -138,7 +137,7 @@ export default {
       return this.accountMap[accountId.substr(14)];
     },
     loadData() {
-      this.selected.dirty = false;
+      this.select({});
       this.newPackageName = 'leadconduit-';
       axios.get('/accountMap')
           .then(response => (this.accountMap = response.data))
@@ -185,6 +184,10 @@ export default {
     }
   },
   created () {
+    this.$store.subscribe((mutation) => {
+      if(mutation.type === 'changeEnv') this.loadData();
+    });
+
     axios.get('/environment')
         .then(response => (this.environment = response.data.env))
         .catch(error => this.flashError(error.message));

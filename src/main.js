@@ -13,6 +13,9 @@ const store = createStore({
     }
   },
   mutations: {
+    changeEnv (state, newEnv) {
+      state.environment = newEnv;
+    },
     flashMessage (state, { message, error, erase }) {
       state.statusMsg = message;
       state.statusIsError = error;

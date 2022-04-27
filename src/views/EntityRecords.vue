@@ -1,20 +1,7 @@
 <template>
   <div class="row">
     <div class="col-4 nav-controls">
-      <div>
-        <h2>environment</h2>
-        <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
-        <label for="local">local</label>
-        <br>
-        <input type="radio" id="development" value="development" v-model="environment" @change="changeEnv">
-        <label for="development">development</label>
-        <br>
-        <input type="radio" id="staging" value="staging" v-model="environment" @change="changeEnv">
-        <label for="staging">staging</label>
-        <br>
-        <input type="radio" id="production" value="production" v-model="environment" @change="changeEnv">
-        <label for="production">production</label>
-      </div>
+      <Environment />
 
       <div class="entity-list">
 
@@ -100,13 +87,16 @@
 <script>
 
 import axios from "axios";
+import Environment from '../components/Environment.vue'
 
 export default {
   name: 'Entities',
+  components: {
+    Environment
+  },
   data () {
     return {
       entities: [],
-      environment: null,
       filterTerm: '',
       loading: false,
       newEntity: {},
@@ -135,13 +125,6 @@ export default {
       this.selected.module_ids.push(this.newModuleId);
       this.selected.dirty = true;
     },
-    changeEnv() {
-      this.flashMessage(`changing env to: ${this.environment}`);
-      this.entities = [];
-      axios.put(`/environment/${this.environment}`)
-          .catch(error => this.flashError(error.message));
-      this.loadData();
-    },
     deleteEntity() {
       var sure = confirm('Are you sure you want to delete this entity?');
       if (sure) {
@@ -161,6 +144,8 @@ export default {
     },
     loadData(selectEntityId) {
       this.loading = true;
+      this.entities = [];
+      this.select({});
       axios.get('/entities', {})
           .then(response => {
             this.entities = response.data;
@@ -224,6 +209,10 @@ export default {
     }
   },
   created () {
+    this.$store.subscribe((mutation) => {
+      if(mutation.type === 'changeEnv') this.loadData();
+    });
+
     axios.get('/environment')
         .then(response => (this.environment = response.data.env))
         .catch(error => this.flashError(error.message));
