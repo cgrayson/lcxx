@@ -17,6 +17,7 @@
 
 <script>
 import axios from "axios";
+import { mapMutations } from 'vuex';
 
 export default {
   name: "Environment.vue",
@@ -26,18 +27,13 @@ export default {
     };
   },
   methods: {
+    ...mapMutations(['flashError', 'flashMessage']),
     changeEnv() {
       this.flashMessage(`changing env to: ${this.environment}`);
       axios.put(`/environment/${this.environment}`)
           .catch(error => this.flashError(error.message));
       this.$store.commit('changeEnv', this.environment);
     },
-    flashError(message) {
-      this.flashMessage(message, true);
-    },
-    flashMessage(message, error = false, erase = true) {
-      this.$store.commit('flashMessage', { message, error, erase });
-    }
   },
   created () {
     axios.get('/environment')

@@ -73,7 +73,8 @@
 
 <script>
 import axios from 'axios';
-import Environment from './Environment.vue'
+import { mapMutations } from 'vuex';
+import Environment from './Environment.vue';
 
 export default {
   name: 'AllowList',
@@ -104,6 +105,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['flashError', 'flashMessage']),
     alreadyListed(id) {
       return this.account && id === this.account.id;
     },
@@ -112,12 +114,6 @@ export default {
         this.selected.account_ids.push(accountId);
         this.selected.dirty = true;
       }
-    },
-    flashError(message) {
-      this.flashMessage(message, true);
-    },
-    flashMessage(message, error = false, erase = true) {
-      this.$store.commit('flashMessage', { message, error, erase });
     },
     getAccountInfo() {
       axios.get(`/account/${this.account.apiKey}`)

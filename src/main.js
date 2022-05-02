@@ -16,12 +16,13 @@ const store = createStore({
     changeEnv (state, newEnv) {
       state.environment = newEnv;
     },
-    flashMessage (state, { message, error, erase }) {
+    flashError (state, message) {
+      state.statusIsError = true;
+      store.commit('flashMessage', message);
+    },
+    flashMessage (state, message) {
       state.statusMsg = message;
-      state.statusIsError = error;
-      if (erase) {
-        setTimeout(() => { state.statusMsg = '' }, 6000);
-      }
+      setTimeout(() => { state.statusMsg = ''; state.statusIsError = false }, 6000);
     }
   }
 })

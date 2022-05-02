@@ -87,6 +87,7 @@
 <script>
 
 import axios from "axios";
+import { mapMutations } from 'vuex';
 import Environment from '../components/Environment.vue'
 
 export default {
@@ -117,6 +118,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['flashError', 'flashMessage']),
     addNewEntity() {
       this.resetNewEntity();
       this.selected = this.newEntity;
@@ -135,12 +137,6 @@ export default {
             })
             .catch(error => this.flashError(error.message));
       }
-    },
-    flashError(message) {
-      this.flashMessage(message, true);
-    },
-    flashMessage(message, error = false, erase = true) {
-      this.$store.commit('flashMessage', { message, error, erase });
     },
     loadData(selectEntityId) {
       this.loading = true;
