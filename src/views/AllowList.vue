@@ -74,7 +74,7 @@
 <script>
 import axios from 'axios';
 import { mapMutations } from 'vuex';
-import Environment from './Environment.vue';
+import Environment from '../components/Environment.vue';
 
 export default {
   name: 'AllowList',

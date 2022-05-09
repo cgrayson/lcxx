@@ -1,20 +1,19 @@
 const fs = require("fs");
+const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const axios = require("axios");
 
-const path = __dirname + '/app/views/';
+const app = express();
 
 if (!process.env.LC_API_SUPER) {
   console.log('Required env var LC_API_SUPER not set');
-  process.exit(2);
+} else {
+  app.use(express.static(path.join(__dirname, 'app', 'views')));
 }
 
 let lcEnv = 'local';
-
-const app = express();
-app.use(express.static(path));
 
 var corsOptions = {
   origin: "http://localhost:8081"
@@ -93,7 +92,10 @@ function updateAccountCache(id, name) {
 }
 
 app.get('/', function (req,res) {
-  res.sendFile(path + "index.html");
+  // this endpoint will only be hit if app isn't using express.static(path)
+  if (!process.env.LC_API_SUPER) {
+    return res.send('<pre>Required env var $LC_API_SUPER not set</pre>');
+  }
 });
 
 app.get('/environment', function (req, res) {

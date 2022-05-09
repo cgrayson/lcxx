@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import AllowList from '../components/AllowList.vue';
+import AllowList from '../views/AllowList.vue';
 import Entities from '../views/EntityRecords.vue';
 
 const routes = [

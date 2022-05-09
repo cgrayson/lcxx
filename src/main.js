@@ -7,7 +7,7 @@ import { createStore } from 'vuex'
 const store = createStore({
   state () {
     return {
-      environment: null,
+      environment: null, // environment will be initiated by response from `/environment`
       statusMsg: '',
       statusIsError: false
     }
