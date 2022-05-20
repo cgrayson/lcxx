@@ -7,17 +7,22 @@ import { createStore } from 'vuex'
 const store = createStore({
   state () {
     return {
+      environment: null, // environment will be initiated by response from `/environment`
       statusMsg: '',
       statusIsError: false
     }
   },
   mutations: {
-    flashMessage (state, { message, error, erase }) {
+    changeEnv (state, newEnv) {
+      state.environment = newEnv;
+    },
+    flashError (state, message) {
+      state.statusIsError = true;
+      store.commit('flashMessage', message);
+    },
+    flashMessage (state, message) {
       state.statusMsg = message;
-      state.statusIsError = error;
-      if (erase) {
-        setTimeout(() => { state.statusMsg = '' }, 6000);
-      }
+      setTimeout(() => { state.statusMsg = ''; state.statusIsError = false }, 6000);
     }
   }
 })

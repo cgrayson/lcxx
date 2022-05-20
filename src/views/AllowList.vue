@@ -1,20 +1,7 @@
 <template>
   <div class="row">
     <div class="col-4 nav-controls">
-      <div>
-        <h2>environment</h2>
-        <input type="radio" id="local" value="local" v-model="environment" @change="changeEnv">
-        <label for="local">local</label>
-        <br>
-        <input type="radio" id="development" value="development" v-model="environment" @change="changeEnv">
-        <label for="development">development</label>
-        <br>
-        <input type="radio" id="staging" value="staging" v-model="environment" @change="changeEnv">
-        <label for="staging">staging</label>
-        <br>
-        <input type="radio" id="production" value="production" v-model="environment" @change="changeEnv">
-        <label for="production">production</label>
-      </div>
+      <Environment />
 
       <div>
         <h2>account lookup</h2>
@@ -86,9 +73,14 @@
 
 <script>
 import axios from 'axios';
+import { mapMutations } from 'vuex';
+import Environment from '../components/Environment.vue';
 
 export default {
   name: 'AllowList',
+  components: {
+    Environment
+  },
   data () {
     return {
       account: {
@@ -96,7 +88,6 @@ export default {
         id: null,
         name: null
       },
-      environment: null,
       integrations: [],
       accountMap: {},
       selected: {},
@@ -114,6 +105,7 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['flashError', 'flashMessage']),
     alreadyListed(id) {
       return this.account && id === this.account.id;
     },
@@ -122,18 +114,6 @@ export default {
         this.selected.account_ids.push(accountId);
         this.selected.dirty = true;
       }
-    },
-    changeEnv() {
-      this.flashMessage(`changing env to: ${this.environment}`);
-      axios.put(`/environment/${this.environment}`)
-        .catch(error => this.flashError(error.message));
-      this.loadData();
-    },
-    flashError(message) {
-      this.flashMessage(message, true);
-    },
-    flashMessage(message, error = false, erase = true) {
-      this.$store.commit('flashMessage', { message, error, erase });
     },
     getAccountInfo() {
       axios.get(`/account/${this.account.apiKey}`)
@@ -153,7 +133,7 @@ export default {
       return this.accountMap[accountId.substr(14)];
     },
     loadData() {
-      this.selected.dirty = false;
+      this.select({});
       this.newPackageName = 'leadconduit-';
       axios.get('/accountMap')
           .then(response => (this.accountMap = response.data))
@@ -200,6 +180,10 @@ export default {
     }
   },
   created () {
+    this.$store.subscribe((mutation) => {
+      if(mutation.type === 'changeEnv') this.loadData();
+    });
+
     axios.get('/environment')
         .then(response => (this.environment = response.data.env))
         .catch(error => this.flashError(error.message));
