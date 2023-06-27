@@ -121,7 +121,6 @@ export default {
           this.account.id = null;
           if (response.data.id) {
             this.account = response.data;
-            this.accountMap[this.account.id.substr(14)] = this.account.name;
           }
           else {
             this.flashError(response.data.status === 401 ? 'Account not found' : response.data.message || 'Error getting account info');
@@ -130,7 +129,7 @@ export default {
         .catch(error => this.flashError(error.message));
     },
     lookupAccount(accountId = '') {
-      return this.accountMap[accountId.substr(14)];
+      return this.accountMap[accountId];
     },
     loadData() {
       this.select({});

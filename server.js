@@ -14,12 +14,9 @@ if (!process.env.LC_API_SUPER) {
 }
 
 let lcEnv = 'local';
+let accountMap = {};
 
-var corsOptions = {
-  origin: "http://localhost:8081"
-};
-
-app.use(cors(corsOptions));
+app.use(cors( { origin: "http://localhost:8081" } ));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -59,7 +56,7 @@ async function api(method, environment, resourcePath, data, res, apiKey) {
       res.status(e.response.status).send(e.message);
     }
     else {
-      return e;
+      return [];
     }
   }
 }
@@ -80,17 +77,6 @@ async function postData(environment, resourcePath, data, res, apiKey = process.e
   api('post', environment, resourcePath, data, res, apiKey);
 }
 
-function cachePath(env = lcEnv) {
-  return `${__dirname}/app/cache/${env}.json`;
-}
-
-function updateAccountCache(id, name) {
-  if (!id) return;
-  const cache = require(cachePath());
-  cache[id.substr(14)] = name;
-  fs.writeFileSync(cachePath(), JSON.stringify(cache, null, 2));
-}
-
 app.get('/', function (req,res) {
   // this endpoint will only be hit if app isn't using express.static(path)
   if (!process.env.LC_API_SUPER) {
@@ -104,13 +90,12 @@ app.get('/environment', function (req, res) {
 
 app.put('/environment/:env', function (req, res) {
   lcEnv = req.params.env;
+  accountMap = {};
   res.sendStatus(200);
 });
 
 app.get('/account/:apiKey', async (req, res) => {
-  const data = await getData(lcEnv, 'account', null, req.params.apiKey);
-  updateAccountCache(data.id, data.name);
-  res.send(data);
+  await getData(lcEnv, 'account', res, req.params.apiKey);
 })
 
 app.get('/allowlists', async (req, res) => {
@@ -121,8 +106,18 @@ app.get('/entities', async (req, res) => {
   await getData(lcEnv, 'entities', res);
 })
 
-app.get('/accountMap', function (req, res) {
-  res.sendFile(`${cachePath(lcEnv)}`);
+app.get('/accountMap', async function (req, res) {
+  // see if the map is already loaded
+  if(Object.keys(accountMap).length === 0) {
+    const entitiesArray = await api('get', lcEnv, 'entities', {}, null, process.env.LC_API_SUPER);
+
+    entitiesArray.forEach(entity => {
+      if (entity.account) {
+        accountMap[entity.id] = entity.name;
+      }
+    });
+  }
+  res.send(accountMap);
 });
 
 app.post('/packages/:packageId', async (req, res) => {
